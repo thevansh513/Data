@@ -1,0 +1,51 @@
+{
+  "rules": {
+    "users": {
+      ".read": "auth != null",
+      "$uid": {
+        ".write": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'Admin')"
+      }
+    },
+    "tournaments": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'Admin'",
+      "$tournamentId": {
+        "participants": {
+          "$userId": {
+            // Allow any player to register/join themselves in a tournament
+            ".write": "auth != null && auth.uid === $userId"
+          }
+        }
+      }
+    },
+    "transactions": {
+      // Admins can read all transactions, users can read their own transactions
+      ".read": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'Admin' || query.orderByChild === 'userId' && query.equalTo === auth.uid)",
+      "$transactionId": {
+        ".read": "auth != null && (data.child('userId').val() === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'Admin')",
+        // Users can create a transaction, Admins can write/approve/reject them
+        ".write": "auth != null && (!data.exists() || root.child('users').child(auth.uid).child('role').val() === 'Admin')"
+      }
+    },
+    "tickets": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'Admin'",
+      "$ticketId": {
+        ".read": "auth != null && (data.child('userId').val() === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'Admin')",
+        ".write": "auth != null && (!data.exists() || data.child('userId').val() === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'Admin')"
+      }
+    },
+    "promoCodes": {
+      ".read": "auth != null",
+      // Only Admin can create or delete promo codes
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'Admin'",
+      "$code": {
+        "claimedBy": {
+          "$userId": {
+            // Users can mark themselves as having claimed the code
+            ".write": "auth != null && auth.uid === $userId"
+          }
+        }
+      }
+    }
+  }
+}

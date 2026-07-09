@@ -1,0 +1,6 @@
+{
+  "name": "DograPay Arena",
+  "description": "An e-sports gaming tournament platform where players can register with Aadhaar KYC and join tournaments to earn real rewards, featuring secure real-time wallet transactions and dual User/Admin panels.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
